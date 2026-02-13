@@ -1,7 +1,5 @@
-import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -13,9 +11,12 @@ import {
   Alert,
   Linking,
 } from "react-native";
-import { getBalance, getTokens, getTxns, short } from "./rpcHelper";
+import { getBalance, getTokens, getTxns } from "../../src/services/solana";
+import { short } from "@/utils/format";
+import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function App() {
+export default function Wallet() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
@@ -80,7 +81,12 @@ export default function App() {
           keyExtractor={(t) => t.mint}
           scrollEnabled={false}
           renderItem={({ item }) => (
-            <View style={s.row}>
+            <TouchableOpacity
+              style={s.row}
+              onPress={() =>
+                router.push(`token/${item.mint}?amount=${item.amount}`)
+              }
+            >
               <Text style={s.mint}>{short(item.mint, 6)}</Text>
               <Text style={s.amount}>{item.amount}</Text>
 
@@ -89,7 +95,7 @@ export default function App() {
                   Linking.openURL(`https://solscan.io/tx/${item.sig}`)
                 }
               ></TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </ScrollView>
@@ -182,7 +188,7 @@ const s = StyleSheet.create({
     borderRadius: 24,
     padding: 28,
     alignItems: "center",
-    marginTop: 28,
+    marginVertical: 28,
     borderWidth: 1,
     borderColor: "#2A2A35",
   },
