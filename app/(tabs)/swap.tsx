@@ -25,7 +25,19 @@ export default function Swap() {
               <Text style={styles.currencyLabel}>ETH</Text>
               <Ionicons name="chevron-down" size={20} color={"#fff"} />
             </TouchableOpacity>
-            <TextInput style={styles.amount}>0.28014</TextInput>
+            <TextInput
+              style={styles.amount}
+              keyboardType="decimal-pad"
+              inputMode="decimal"
+              textBreakStrategy="balanced"
+              multiline
+              lineBreakModeIOS="wordWrapping"
+              lineBreakStrategyIOS="standard"
+              numberOfLines={2}
+              maxLength={12}
+            >
+              0.28014
+            </TextInput>
           </View>
           <View style={styles.cardRow}>
             <Text style={styles.balance}>Balance: 0.00661 ETH</Text>
@@ -42,7 +54,19 @@ export default function Swap() {
               <Text style={styles.currencyLabel}>Dai</Text>
               <Ionicons name="chevron-down" size={20} color={"#fff"} />
             </TouchableOpacity>
-            <TextInput style={styles.amount}>0.28014</TextInput>
+            <TextInput
+              style={styles.amount}
+              keyboardType="decimal-pad"
+              inputMode="decimal"
+              textBreakStrategy="balanced"
+              multiline
+              lineBreakModeIOS="wordWrapping"
+              lineBreakStrategyIOS="standard"
+              numberOfLines={2}
+              maxLength={12}
+            >
+              0.28014
+            </TextInput>
           </View>
           <View style={styles.cardRow}>
             <Text style={styles.balance}>Balance: 0.00661 Dai</Text>
@@ -92,8 +116,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   amount: {
+    width: 200,
     color: "#fff",
     fontSize: 28,
+    flexWrap: "wrap",
+    textAlign: "right",
   },
   swapArrow: {
     position: "absolute",
