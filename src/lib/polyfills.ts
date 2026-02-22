@@ -9,7 +9,7 @@ class Crypto {
 
 const webCrypto = typeof crypto !== "undefined" ? crypto : new Crypto();
 
-if (typeof webCrypto === "undefined") {
+if (typeof crypto === "undefined") {
   Object.defineProperty(globalThis, "crypto", {
     configurable: true,
     enumerable: true,
