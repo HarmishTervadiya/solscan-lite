@@ -85,32 +85,8 @@ export default function SendScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={"position"}
     >
-      <View style={styles.header}>
-        <Text style={styles.title}>◎ SolScan</Text>
-        <ConnectButton
-          connected={wallet.connected}
-          connecting={wallet.connecting}
-          publicKey={wallet.publicKey?.toBase58() ?? null}
-          onConnect={wallet.connect}
-          onDisconnect={wallet.disconnect}
-        />
-      </View>
-
-      <View style={styles.card}>
-        <View style={styles.favoriteWrapper}>
-          <FavoriteButton address={wallet.publicKey?.toString() || ""} />
-        </View>
-        <Text style={styles.label}>SOL Balance</Text>
-        <View style={styles.balanceRow}>
-          <Text style={styles.balance}>{balance?.toFixed(4)}</Text>
-          <Text style={styles.sol}>SOL</Text>
-        </View>
-        <Text style={styles.addr}>
-          {short(wallet.publicKey?.toString() || "", 6)}
-        </Text>
-      </View>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>

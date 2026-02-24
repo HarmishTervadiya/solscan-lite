@@ -1,6 +1,9 @@
 import {
+  FlatList,
   KeyboardAvoidingView,
+  Linking,
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,13 +14,23 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ConnectButton } from "@/components/ConnectButton";
 import { useWallet } from "@/hooks/useWallet";
-import { short } from "@/utils/format";
+import { short, timeAgo } from "@/utils/format";
 import { FavoriteButton } from "@/components/FavouriteButton";
 import { router } from "expo-router";
+import { getTxns } from "@/services/solana";
 
 export default function WalletScreen() {
   const wallet = useWallet();
   const [balance, setBalance] = useState<number | null>(null);
+  const [txns, setTxns] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchTxns = async () => {
+    if (!wallet.publicKey) return;
+    const txns = await getTxns(wallet.publicKey.toBase58())
+    console.log(txns)
+    setTxns(txns);
+  }
 
   const fetchBalance = async () => {
     setBalance(await wallet.getBalance());
@@ -25,7 +38,13 @@ export default function WalletScreen() {
 
   useEffect(() => {
     fetchBalance();
+    fetchTxns();
   }, [wallet.connection, wallet.publicKey]);
+
+  const handleRefresh = () => {
+    fetchBalance();
+    fetchTxns();
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -33,7 +52,15 @@ export default function WalletScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ScrollView style={styles.scroll}>
+        <ScrollView style={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              progressBackgroundColor={"#000"}
+              colors={["#14F195"]}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />}>
+
           <View style={styles.header}>
             <Text style={styles.title}>◎ SolScan</Text>
             <ConnectButton
@@ -46,9 +73,6 @@ export default function WalletScreen() {
           </View>
 
           <View style={styles.card}>
-            <View style={styles.favoriteWrapper}>
-              <FavoriteButton address={wallet.publicKey?.toString() || ""} />
-            </View>
             <Text style={styles.label}>SOL Balance</Text>
             <View style={styles.balanceRow}>
               <Text style={styles.balance}>{balance?.toFixed(4)}</Text>
@@ -59,7 +83,7 @@ export default function WalletScreen() {
             </Text>
           </View>
 
-          {/* {wallet.connected && ( */}
+          {wallet.connected && (
             <View style={{ marginTop: 12 }}>
               <TouchableOpacity
                 style={styles.btn}
@@ -68,7 +92,38 @@ export default function WalletScreen() {
                 <Text style={styles.btnText}>Send SOL</Text>
               </TouchableOpacity>
             </View>
-          {/* )} */}
+          )}
+
+          <Text style={styles.section}>Recent Transactions</Text>
+          <FlatList
+            data={txns}
+            keyExtractor={(t) => t.sig}
+            scrollEnabled={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.row}
+                onPress={() =>
+                  Linking.openURL(`https://solscan.io/tx/${item.sig}`)
+                }
+              >
+                <View>
+                  <Text style={styles.mint}>{short(item.sig, 8)}</Text>
+                  <Text style={styles.time}>
+                    {item.time ? timeAgo(item.time) : "pending"}
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    color: item.ok ? "#14F195" : "#EF4444",
+                    fontSize: 18,
+                  }}
+                >
+                  {item.ok ? "+" : "-"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
